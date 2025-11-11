@@ -15,6 +15,6 @@ Página inicial do site com principais informações, como: Instruções de como
 
 
 
-*Contribuição: 
+*Contribuição:*
 1. *EmanuelS. (Hora de envio: 14:26)*
 2. *Arthur H (Hora de envio: 14:34)*
