@@ -1,0 +1,164 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(180deg, #0a0a0f, #1a1a2e);
+  color: #ffffff;
+  overflow-x: hidden;
+}
+
+header {
+  width: 100%;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(8px);
+  position: sticky;
+  top: 0;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+header h1 {
+  font-size: 28px;
+  letter-spacing: 2px;
+  font-weight: bold;
+  color: #ffca28;
+}
+
+nav a {
+  color: #fff;
+  margin-left: 20px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+nav a:hover { 
+  color: #ffca28; 
+}
+
+.hero {
+  height: 100vh;
+  background: url('https://lauratarot.com/wp-content/uploads/2024/11/os-22-arcanos-maiores.jpg') center/cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-shadow: 0 0 10px #000;
+
+  mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+  mask-size: 100% 200%;
+  mask-position: 0 0;
+
+  transition: mask-position 0.1s linear;
+}
+
+.hero h2 {
+  font-size: 42px;
+  font-weight: bold;
+}
+
+.news-section {
+  justify-content: center;
+  display: flex;
+  flex-direction: row;
+
+  gap: 30px;
+  padding: 50px;
+  margin: 0 auto;
+}
+
+.news-card {
+  width: 320px;
+  border-radius: 12px;
+  background-color: #1a1a1a;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  transition: transform 0.3s;
+}
+
+.news-card:hover {
+  transform: translateY(-5px);
+}
+
+.news-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.news-content {
+  padding: 15px;
+}
+
+.news-content h3 {
+  font-size: 18px;
+  margin-bottom: 8px;
+  color: #c28fff;
+}
+
+.news-content p {
+  font-size: 14px;
+  margin-bottom: 10px;
+  color: #e6e6e6;
+}
+
+.news-content span {
+  font-size: 12px;
+  color: #999;
+}
+
+footer {
+  text-align: center;
+  padding: 20px;
+  margin-top: 40px;
+  background: rgba(0,0,0,0.4);
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+.about-game {
+  max-width: 900px;
+  margin: 60px auto;
+  padding: 30px;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 15px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.4);
+  backdrop-filter: blur(6px);
+}
+
+.about-game h2 {
+  color: #ffca28;
+  font-size: 26px;
+  margin-bottom: 15px;
+  letter-spacing: 1px;
+}
+
+.about-game p {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #ddd;
+  margin-bottom: 25px;
+}
+
+.about-game ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.about-game ul li {
+  font-size: 15px;
+  margin-bottom: 12px;
+  color: #ccc;
+  padding-left: 20px;
+  position: relative;
+}
+
+.about-game ul li::before {
+  content: "✦";
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: #c28fff;
+  font-size: 14px;
+}
