@@ -1,218 +1,306 @@
-////
-/* CANVAS */
-////
-    // /* 1. FUNDO */ //
-        /* Setup */
-            const canvas = document.getElementById("arena");
-            const ctx = canvas.getContext("2d");
+/* /////////////////////
+Este é o código do servidor do jogo. Nosso objetivo é:
+    1. O usuário abrirá jogo.html
+    2. Ao abrir o site:
+        - Nº ímpar de jog.: Conectará uma "partida" com outro jogador disponível
+        - Nº par de jog.: Ficará em espera até outro jogador conectar
+    3. A partida começará, criando um campo de jogo
+*/ /////////////////////
 
 
-        /* Redimensionamento */
-            function redimensionar() {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-                desenharTabuleiro();
-                // desenharAreaEspera();
-            }
-            window.onresize = redimensionar;
+/* express setup */ 
+    const express = require('express');                                            // importa express
+    const app = express();                                                         // cria servidor 'express'
+    const port = 3000;
 
 
-        /* Setup das interações */
-            let arenas = [];
-            let snap = { x: 0, y: 0, r: 0 };
+/* socket.io setup */
+    const http = require('http');                                                  // importa pacote 'http'
+    const server = http.createServer(app);                                         // cria servidor 'http'
+    const { Server } = require('socket.io');                                       // importa socket.io em objeto 'Socket'
+    const io = new Server(server);                                                 // cria servidor socket.io
 
-        
-        /* Imagem de Fundo */
-            const boardImg = new Image();
-            boardImg.src = "tabuleiro.jpeg";  // imagem enviada por você
+    app.get('/', (req, res) => {
+        res.send('');
+    });
 
-            boardImg.onload = () => redimensionar();
-        
-
-        /* Desenho do Tabuleiro */
-            function desenharTabuleiro() {
-                const W = canvas.width;
-                const H = canvas.height;
+    server.listen(port, () => console.log('http://localhost:' + port));
 
 
-                /* Área do Tabuleiro */ 
-                    const gameAreaW = W * 0.80;
-                    const gameAreaX = 0; 
+/* Partidas */
+    const partidas = {};
+    class Partida {
+        constructor(id) {
+            this.id = id;
+            this.jogadores = []; // Máximo = 2 
+            this.estado = 'espera'; // espera, ativa, encerrada
+            this.turno = 0; // Índice do jogador da vez (0 ou 1)
+            this.data = new Date();
+        }
 
-
-                /* Imagem de Fundo */ 
-                    // proporções originais da imagem
-                    const imgW = boardImg.width;
-                    const imgH = boardImg.height;
-                    const imgRatio = imgW / imgH;
-
-                    // proporção da área de exibição disponível
-                    const areaRatio = gameAreaW / H;
-                    let drawW, drawH;
-
-                    if(imgRatio > areaRatio) {
-                        // limita a largura
-                        drawW = gameAreaW;
-                        drawH = drawW / imgRatio;
-                    } else {
-                        // limita a altura
-                        drawH = H;
-                        drawW = drawH * imgRatio;
-                    }
-
-                    // centra dentro da área do tabuleiro
-                    const drawX = gameAreaX + (gameAreaW - drawW) / 2;
-                    const drawY = (H - drawH) / 2;
-                    ctx.clearRect(0, 0, W, H);
-
-                    // desenha imagem sem distorção
-                    ctx.drawImage(boardImg, drawX, drawY, drawW, drawH);
-
-                    // borda do tabuleiro, se houver margens
-                    if(drawW < gameAreaW || drawH < H) {
-                        ctx.strokeStyle = "#ffdc6459";
-                        ctx.lineWidth = 4;
-                        ctx.strokeRect(drawX, drawY, drawW, drawH);
-                    }
-
-
-                /* Arenas */ 
-                    const arenaWidth = drawW * 0.22;
-                    const arenaHeight = drawH * 0.55;
-                    const spacing = drawW * 0.07;
-
-                    const totalWidth = arenaWidth * 3 + spacing * 2;
-                    const startX = drawX + (drawW - totalWidth) / 2;
-
-                    const topY = drawY + drawH * 0.20;
-
-                    arenas = [
-                        { x: startX, y: topY, w: arenaWidth, h: arenaHeight },
-                        { x: startX + arenaWidth + spacing, y: topY, w: arenaWidth, h: arenaHeight },
-                        { x: startX + (arenaWidth + spacing)*2, y: topY, w: arenaWidth, h: arenaHeight }
-                    ];
-
-                
-                /* Botão Snap */
-                    snap.x = drawX + drawW / 2;
-                    snap.y = drawY + drawH * 0.88;
-                    snap.r = drawW * 0.02;
-
-                
-                /* Recuo entre Deck e Tabuleiro */
-                    
-
-
-                /* Área do Deck */ 
-                ctx.fillStyle = "#160819";
-                ctx.fillRect(gameAreaW, 0, W - gameAreaW, H);
-                ctx.strokeStyle = "#ffdc6459";
-                ctx.lineWidth = 4;
-                ctx.strokeRect(gameAreaW, 0, W - gameAreaW, H);
-            }
-
-        
-        /* Desenho da Tela de Espera */    
-            function desenharAreaEspera() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-                ctx.fillStyle = "#160819";
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                ctx.fillStyle = "#ffdc6459";
-                ctx.font = "40px serif";
-                ctx.textAlign = "center";
-                ctx.fillText("Esperando um jogador...", canvas.width/2, canvas.height/2);
-            }
-
-
-        /* Alternância de Tabuleiro e Espera */
-            function alternarDesenho() {
-                if(estadoJogo === "espera") desenharAreaEspera();
-                else desenharTabuleiro();
-                requestAnimationFrame(alternarDesenho);
-            }
-            alternarDesenho();
-
-
-
-        /* Eventos de Interação */
-            // canvas.addEventListener("mousemove", e => {
-            //     const rect = canvas.getBoundingClientRect();
-            //     const mx = e.clientX - rect.left;
-            //     const my = e.clientY - rect.top;
-
-            //     const dist = Math.hypot(mx - button.x, my - button.y);
-            //     buttonHover = dist < button.r;
-
-            //     draw();
-            // });
-
-            canvas.addEventListener("click", e => {
-                const rect = canvas.getBoundingClientRect();
-                const mx = e.clientX - rect.left;
-                const my = e.clientY - rect.top;
-
-                // clique no botão
-                if (Math.hypot(mx - snap.x, my - snap.y) < snap.r) {
-                    alert("Você clicou no botão!");
-                }
-
-                // clique nas arenas
-                arenas.forEach((a, i) => {
-                    if (mx > a.x && mx < a.x + a.w && my > a.y && my < a.y + a.h)
-                        alert("Arena " + (i + 1) + " clicada!");
+        adicionarJogador(jogadorId, nome) {
+            if(this.jogadores.length < 2) {
+                this.jogadores.push({
+                    id: jogadorId,
+                    nome: nome,
+                    pontos: 0,
                 });
-            });
-    
+                return true;
+            }
 
-    // /* 2. CARTAS */ //
+            else return false;
+        }
 
+        removerJogador(jogadorId) {
+            this.jogadores = this.jogadores.filter(jog => jog.id !== jogadorId); // apaga jogador
+            if(this.jogadores.length === 0) delete partidas[this.id];
+        }
 
-    // /* 3. DECK */ //
+        rodada(jogadorId) {}
 
+        verificarVencedor() {}
 
-    // /* 4. UI */ //
+        encerrarPartida() {}
+    }
 
+    io.on('connection', (socket) => {
+        console.log('+ 1 conexão');
 
-////
-/* JOGO */
-////
-    /* Setup */
-        const socket = io();
-        
-
-
-
-// window.addEventListener("load", () => {
-//     const canvas = document.getElementById("arena");
-
-//     if(canvas.getContext) {
-//         /* Canvas */
-//         // Setup
-//         const ctx = canvas.getContext("2d");
-        
-//         // Fundo
-//         const img = new Image();
-//         img.addEventListener("load", () => { ctx.drawImage(img, 0, 0); });
-//         img.src = "arena.jpeg";
+        socket.on('esperar-partida', (turno) => {});
+        socket.on('jogar-rodada', () => {});
+        socket.on('deixar-partida', () => {});
+    });
 
 
 
 
-//         //////
-//         /* Servidor */ 
-//         const socket = io('ws://localhost:8080');
-
-//         socket.on('turno', () => {
-            
-//         });
-
-//         let deck1 = [];
-//         let deck2 = [];
-
-//     } 
-
-//     else console.log("Desculpe, seu navegador não é compatível com <canvas> :(");
-
+// const io = require('socket.io')(http, {
+//     cors: { origin: '*' }
 // });
+
+
+
+/* // servidor.js
+const express = require('express');
+const http = require('http');
+const socketIo = require('socket.io');
+
+const app = express();
+const server = http.createServer(app);
+const io = socketIo(server);
+
+// ============================
+// GERENCIADOR DE PARTIDAS
+// ============================
+
+const partidas = {};  // Todas as partidas ativas
+const salaEspera = []; // Jogadores esperando partida
+
+class Partida {
+    constructor(id) {
+        this.id = id;
+        this.jogadores = []; // Máximo 2 jogadores
+        this.estado = 'aguardando'; // aguardando, ativa, finalizada
+        this.tabuleiro = Array(9).fill(null); // Exemplo jogo da velha
+        this.turno = 0; // Índice do jogador da vez (0 ou 1)
+        this.criadaEm = new Date();
+    }
+    
+    adicionarJogador(jogadorId, nome) {
+        if (this.jogadores.length < 2) {
+            this.jogadores.push({
+                id: jogadorId,
+                nome: nome,
+                pontos: 0,
+                simbolo: this.jogadores.length === 0 ? 'X' : 'O'
+            });
+            
+            if (this.jogadores.length === 2) {
+                this.estado = 'ativa';
+                this.notificarInicio();
+            }
+            
+            return true;
+        }
+        return false;
+    }
+    
+    removerJogador(jogadorId) {
+        this.jogadores = this.jogadores.filter(j => j.id !== jogadorId);
+        if (this.jogadores.length === 0) {
+            delete partidas[this.id];
+        }
+    }
+    
+    notificarInicio() {
+        // Enviar para AMBOS os jogadores da partida
+        this.jogadores.forEach(jogador => {
+            io.to(jogador.id).emit('partida-iniciada', {
+                partidaId: this.id,
+                oponente: this.jogadores.find(j => j.id !== jogador.id),
+                seuSimbolo: jogador.simbolo,
+                voceComeca: this.turno === this.jogadores.indexOf(jogador)
+            });
+        });
+    }
+    
+    fazerJogada(jogadorId, posicao) {
+        const jogadorIndex = this.jogadores.findIndex(j => j.id === jogadorId);
+        
+        if (jogadorIndex !== this.turno) return false;
+        if (this.tabuleiro[posicao] !== null) return false;
+        
+        this.tabuleiro[posicao] = jogadorIndex; // 0 ou 1
+        
+        // Notificar ambos os jogadores
+        this.enviarParaPartida('jogada-feita', {
+            posicao: posicao,
+            jogador: jogadorId,
+            simbolo: this.jogadores[jogadorIndex].simbolo
+        });
+        
+        // Verificar vitória
+        if (this.verificarVitoria(jogadorIndex)) {
+            this.finalizarPartida(jogadorId);
+            return true;
+        }
+        
+        // Próximo turno
+        this.turno = (this.turno + 1) % 2;
+        this.enviarParaPartida('turno-alterado', {
+            jogadorDaVez: this.jogadores[this.turno].id
+        });
+        
+        return true;
+    }
+    
+    enviarParaPartida(evento, dados) {
+        this.jogadores.forEach(jogador => {
+            io.to(jogador.id).emit(evento, dados);
+        });
+    }
+    
+    verificarVitoria(jogadorIndex) {
+        const combinacoes = [
+            [0,1,2], [3,4,5], [6,7,8], // Linhas
+            [0,3,6], [1,4,7], [2,5,8], // Colunas
+            [0,4,8], [2,4,6]           // Diagonais
+        ];
+        
+        return combinacoes.some(combinacao => 
+            combinacao.every(pos => this.tabuleiro[pos] === jogadorIndex)
+        );
+    }
+    
+    finalizarPartida(vencedorId) {
+        this.estado = 'finalizada';
+        this.enviarParaPartida('partida-finalizada', {
+            vencedor: vencedorId,
+            tabuleiroFinal: this.tabuleiro
+        });
+        
+        // Limpar partida após 30 segundos
+        setTimeout(() => {
+            if (partidas[this.id]) {
+                delete partidas[this.id];
+            }
+        }, 30000);
+    }
+}
+
+// ============================
+// LÓGICA DE CONEXÃO
+// ============================
+
+io.on('connection', (socket) => {
+    console.log('Novo cliente conectado:', socket.id);
+    
+    // 1. Jogador procura partida
+    socket.on('procurar-partida', (nomeJogador) => {
+        console.log(`${nomeJogador} está procurando partida`);
+        
+        socket.nome = nomeJogador;
+        
+        if (salaEspera.length > 0) {
+            // Tem jogador esperando - criar partida
+            const oponenteSocketId = salaEspera.shift();
+            const partidaId = `partida_${Date.now()}`;
+            
+            // Criar nova partida
+            const partida = new Partida(partidaId);
+            partidas[partidaId] = partida;
+            
+            // Adicionar ambos os jogadores
+            partida.adicionarJogador(oponenteSocketId, io.sockets.sockets.get(oponenteSocketId).nome);
+            partida.adicionarJogador(socket.id, nomeJogador);
+            
+            // Colocar sockets nas salas
+            socket.join(partidaId);
+            io.sockets.sockets.get(oponenteSocketId).join(partidaId);
+            
+            // Notificar jogadores
+            io.to(oponenteSocketId).emit('partida-encontrada', { partidaId });
+            socket.emit('partida-encontrada', { partidaId });
+            
+        } else {
+            // Ninguém esperando - colocar na fila
+            salaEspera.push(socket.id);
+            socket.emit('aguardando-oponente');
+        }
+    });
+    
+    // 2. Jogador faz jogada
+    socket.on('fazer-jogada', (dados) => {
+        const { partidaId, posicao } = dados;
+        const partida = partidas[partidaId];
+        
+        if (partida && partida.jogadores.some(j => j.id === socket.id)) {
+            partida.fazerJogada(socket.id, posicao);
+        }
+    });
+    
+    // 3. Jogador deixa partida
+    socket.on('sair-partida', (partidaId) => {
+        const partida = partidas[partidaId];
+        if (partida) {
+            partida.removerJogador(socket.id);
+            socket.leave(partidaId);
+        }
+    });
+    
+    // 4. Desconexão
+    socket.on('disconnect', () => {
+        console.log(`${socket.id} desconectou`);
+        
+        // Remover da sala de espera
+        const index = salaEspera.indexOf(socket.id);
+        if (index > -1) {
+            salaEspera.splice(index, 1);
+        }
+        
+        // Sair de todas as partidas
+        for (const partidaId in partidas) {
+            const partida = partidas[partidaId];
+            if (partida.jogadores.some(j => j.id === socket.id)) {
+                partida.removerJogador(socket.id);
+                
+                // Notificar oponente
+                const oponente = partida.jogadores.find(j => j.id !== socket.id);
+                if (oponente) {
+                    io.to(oponente.id).emit('oponente-desconectou');
+                }
+            }
+        }
+    });
+});
+
+// ============================
+// INICIAR SERVIDOR
+// ============================
+
+const PORT = 8080;
+server.listen(PORT, () => {
+    console.log(`Servidor rodando na porta ${PORT}`);
+    console.log(`Gerenciando partidas 1vs1`);
+});
+*/
