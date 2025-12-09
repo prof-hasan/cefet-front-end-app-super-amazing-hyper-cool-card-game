@@ -1,7 +1,22 @@
 <!DOCTYPE html>
-<head>
-    <script src="https://cdn.socket.io/socket.io-4.8.1.js"></script>
-    <script src="jogo.js"></script>
-</head>
-<body>
-</body>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Tarot Snap</title>
+        <style>
+            body {
+                margin: 0;
+                overflow: hidden;
+                background: #000;
+            }
+            canvas {
+                display: block;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas id=arena></canvas>
+        <script src="https://cdn.socket.io/socket.io-4.8.1.js"></script>
+        <script src="jogo.js"></script>
+    </body>
+</html>
