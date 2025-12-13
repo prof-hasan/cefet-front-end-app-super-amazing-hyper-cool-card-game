@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <!-- Colocar icone do site -->
+  <link rel="icon" type="image/png" href="icon"/>
+
+  <title>Biblioteca de Cartas</title>
+
+  <!-- Tailwind (FremeWork - Versao online) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="estilos.css" />
+</head>
+<body class="bg-gray-900 text-white antialiased">
+
+  <main class="max-w-7xl mx-auto p-6">
+    <h1 class="text-center text-4xl font-extrabold mb-8 tracking-wide">
+      Biblioteca de Cartas
+    </h1>
+
+    <div id="controls" class="mb-6 flex flex-wrap gap-3 justify-center">
+      <input
+        id="search"
+        type="search"
+        placeholder="Buscar carta..."
+        class="px-3 py-2 rounded bg-gray-800 border border-gray-700
+               focus:outline-none focus:ring focus:border-yellow-500"
+      />
+    </div>
+
+    <section
+      id="grid"
+      class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8"
+    >
+    </section>
+  </main>
+
+  <script src="java.js"></script>
+
+</body>
+</html>
