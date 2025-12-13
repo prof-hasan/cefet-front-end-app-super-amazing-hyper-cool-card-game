@@ -1,22 +1,82 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>Tarot Snap</title>
-        <style>
-            body {
-                margin: 0;
-                overflow: hidden;
-                background: #000;
-            }
-            canvas {
-                display: block;
-            }
-        </style>
-    </head>
-    <body>
-        <canvas id=arena></canvas>
-        <script src="https://cdn.socket.io/socket.io-4.8.1.js"></script>
-        <script src="jogo.js"></script>
-    </body>
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tarot Snap</title>
+
+  <link rel="stylesheet" href="estilo.css" />
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div>
+        <h1>Tarot Snap</h1>
+        <div>Arraste cartas da sua mão para um dos três locais. Custo de energia é cobrado ao jogar.</div>
+      </div>
+
+      <div class="controls">
+        <div id="energyDisplay">Energia: 0 / 6</div>
+        <button id="drawBtn">Comprar carta</button>
+        <button id="endTurnBtn">Encerrar turno</button>
+      </div>
+    </div>
+
+    <div class="board">
+      <div class="locations">
+        <div class="location" data-loc="0">
+          <div class="loc-title">Casa de Marte</div>
+          <div class="loc-effect">Cartas ganham +1 poder ao final do turno</div>
+          <div class="loc-zone" id="loc-0"></div>
+          <div class="loc-stats">Total: <span id="total-0">0</span></div>
+        </div>
+        <div class="location" data-loc="1">
+          <div class="loc-title">Plano da Lua</div>
+          <div class="loc-effect">Efeitos duplicados</div>
+          <div class="loc-zone" id="loc-1"></div>
+          <div class="loc-stats">Total: <span id="total-1">0</span></div>
+        </div>
+        <div class="location" data-loc="2">
+          <div class="loc-title">Círculo do Destino</div>
+          <div class="loc-effect">Ao jogar aqui, compre 1 carta</div>
+          <div class="loc-zone" id="loc-2"></div>
+          <div class="loc-stats">Total: <span id="total-2">0</span></div>
+        </div>
+      </div>
+
+      <div class="side">
+        <div class="zone" style="margin-bottom:12px">
+          <div class="deck">
+            <div class="deck-card center" id="deckCount">0</div>
+            <div>
+              <div>Deck</div>
+              <div id="discardCount">Descartes: 0</div>
+            </div>
+          </div>
+
+          <div>Mão</div>
+          <div class="hand" id="hand"></div>
+        </div>
+
+        <div class="zone">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px">
+            <div>Informações</div>
+            <div>Turno: <span id="turnNumber">1</span></div>
+          </div>
+          <div style="font-size:13px; line-height:1.4">
+            <strong>Regras base (demo)</strong>
+            <ul style="margin:6px 0 0 18px">
+              <li>Você tem 6 de energia por turno.</li>
+              <li>Cartas têm <em>custo</em> e <em>poder</em>.</li>
+              <li>Ao jogar, paga-se o custo; o poder é somado ao local.</li>
+              <li>Alguns locais têm efeitos ao jogar (ex.: comprar carta).</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="jogo.js"></script>
+</body>
 </html>
