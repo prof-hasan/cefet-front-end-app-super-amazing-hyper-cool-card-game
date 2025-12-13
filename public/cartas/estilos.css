@@ -1,0 +1,69 @@
+.golden-card {
+  background: linear-gradient(
+    180deg,
+    rgba(18,12,5,0.8) 0%,
+    rgba(6,4,2,0.95) 100%
+  );
+  border-radius: 14px;
+  padding: 12px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255,215,0,0.08);
+  box-shadow:
+    0 6px 18px rgba(0,0,0,0.6),
+    0 0 18px rgba(255,215,0,0.05) inset;
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease;
+}
+
+.golden-card:hover {
+  transform: translateY(-6px);
+  box-shadow:
+    0 12px 30px rgba(0,0,0,0.65),
+    0 0 34px rgba(49, 48, 38, 0.12) inset;
+}
+
+/* brilho decorativo */
+.golden-frame {
+  position: absolute;
+  top: -28%;
+  left: -12%;
+  width: 140%;
+  height: 250%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255,230,150,0.12) 0%,
+    rgba(255,215,0,0.04) 25%,
+    transparent 35%
+  );
+  transform: rotate(-12deg) scale(1.05);
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+.card-image {
+  border-radius: 10px;
+  border: 2px solid rgba(255,215,0,0.12);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.55);
+  background-color: #0b0b0b;
+}
+
+.golden-title {
+  color: #FFD873;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-shadow: 0 1px 0 rgba(0,0,0,0.6);
+}
+
+.card-footer {
+  border-top: 1px solid rgba(255,215,0,0.06);
+  margin-top: 10px;
+  padding-top: 8px;
+}
+
+.card-outer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
